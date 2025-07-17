@@ -1,6 +1,7 @@
 pipeline {
     agent {
-        node('jenkins-agent') {
+        node {
+            label 'jenkins-agent'
             customWorkspace '/opt/GCL/bin'
         }
     }
@@ -32,7 +33,47 @@ pipeline {
                 }
             }
         }
-    
+
+        stage('Execute GCL Files') {
+            steps {
+                script {
+                    // 获取当前工作目录的绝对路径
+                    def workspaceDir = pwd()
+                    echo "📁 工作目录: ${workspaceDir}"
+
+                    // 查找所有.gcl文件
+                    def findResult = sh(
+                        script: "find ${workspaceDir} -name '*.gcl' -type f",
+                        returnStdout: true
+                    ).trim()
+
+                    if (findResult) {
+                        def gclFiles = findResult.split('\n')
+                        echo "🔍 找到 ${gclFiles.size()} 个GCL文件:"
+
+                        // 执行每个.gcl文件
+                        gclFiles.each { gclFile ->
+                            if (gclFile.trim()) {
+                                echo "🚀 执行GCL文件: ${gclFile}"
+                                try {
+                                    def result = sh(
+                                        script: "chsimu \"${gclFile}\" -stdout",
+                                        returnStdout: true
+                                    )
+                                    echo "✅ 执行结果:"
+                                    echo result
+                                } catch (Exception e) {
+                                    echo "❌ 执行失败: ${e.getMessage()}"
+                                }
+                            }
+                        }
+                    } else {
+                        echo "⚠️ 未找到任何.gcl文件"
+                    }
+                }
+            }
+        }
+
     }
     
     post {

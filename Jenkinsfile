@@ -26,11 +26,9 @@ pipeline {
         stage('List files') {
             steps {
                 script {
-                    dir('/opt/GCL/bin/workspace') {
-                        def workspace = pwd()
-                        echo "📁 当前工作目录: ${workspace}"
-                        sh 'ls -la'
-                    }
+                    def workspace = pwd()
+                    echo "📁 当前工作目录: ${workspace}"
+                    sh 'ls -la'
                 }
             }
         }
@@ -62,7 +60,7 @@ pipeline {
             steps {
                 script {
                     echo "🧹 清理workspace目录..."
-                    sh 'sudo rm -rf /opt/GCL/bin/workspace'
+                    sh 'rm -rf /var/jenkins_home/workspace/test'
                     echo "✅ 清理完成"
                 }
             }

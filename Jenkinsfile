@@ -44,21 +44,18 @@ pipeline {
                     def gclFile = "${jenkinsWorkspace}/Ballot.gcl"
                     echo "🚀 执行GCL文件: ${gclFile}"
 
-                    // 切换到/opt/GCL/bin目录执行chsimu命令
-                    dir('/opt/GCL/bin') {
-                        def currentDir = pwd()
-                        echo "📁 当前执行目录: ${currentDir}"
-
-                        try {
-                            def result = sh(
-                                script: "chsimu \"${gclFile}\" -stdout",
-                                returnStdout: true
-                            )
-                            echo "✅ 执行结果:"
-                            echo result
-                        } catch (Exception e) {
-                            echo "❌ 执行失败: ${e.getMessage()}"
-                        }
+                    // 直接在/opt/GCL/bin目录中执行chsimu命令
+                    try {
+                        def result = sh(
+                            script: "cd /opt/GCL/bin && chsimu \"${gclFile}\" -stdout",
+                            returnStdout: true
+                        )
+                        echo "✅ 执行结果:"
+                        echo result
+                    } catch (Exception e) {
+                        echo "❌ 执行失败: ${e.getMessage()}"
+                        // 显示更详细的错误信息
+                        sh "cd /opt/GCL/bin && pwd && ls -la"
                     }
                 }
             }

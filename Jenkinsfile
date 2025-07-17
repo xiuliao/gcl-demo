@@ -38,6 +38,9 @@ pipeline {
                 script {
                     dir('/opt/GCL/bin') {
                         // 直接执行workspace目录中的Ballot.gcl文件
+                        def workspace = pwd()
+                        echo "📁 当前工作目录: ${workspace}"
+                        sh 'ls -la'
                         def gclFile = "/var/jenkins_home/workspace/test/Ballot.gcl"
                         echo "🚀 执行GCL文件: /opt/GCL/bin/chsimu \"${gclFile}\" -stdout"
 

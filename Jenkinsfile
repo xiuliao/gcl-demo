@@ -47,7 +47,7 @@ pipeline {
                     // 直接在/opt/GCL/bin目录中执行chsimu命令
                     try {
                         def result = sh(
-                            script: "cd /opt/GCL/bin && chsimu \"${gclFile}\" -stdout",
+                            script: "cd /opt/GCL/bin && ./chsimu \"${gclFile}\" -stdout",
                             returnStdout: true
                         )
                         echo "✅ 执行结果:"

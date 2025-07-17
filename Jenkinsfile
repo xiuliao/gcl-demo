@@ -36,25 +36,20 @@ pipeline {
         stage('Execute GCL Files') {
             steps {
                 script {
-                    dir('/opt/GCL/bin') {
-                        // 直接执行workspace目录中的Ballot.gcl文件
-                        def workspace = pwd()
-                        echo "📁 当前工作目录: ${workspace}"
-                        sh 'ls -la'
-                        // def gclFile = "/var/jenkins_home/workspace/test/Ballot.gcl"
-                        // echo "🚀 执行GCL文件: /opt/GCL/bin/chsimu \"${gclFile}\" -stdout"
-
-                        // try {
-                        //     def result = sh(
-                        //         script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
-                        //         returnStdout: true
-                        //     )
-                        //     echo "✅ 执行结果:"
-                        //     echo result
-                        // } catch (Exception e) {
-                        //     echo "❌ 执行失败: ${e.getMessage()}"
-                        // }
-                    }
+                    sh 'cd /opt/GCL/bin'
+                    def workspace = pwd()
+                    echo "📁 当前工作目录: ${workspace}"
+                    sh 'ls -la'
+                    // try {
+                    //     def result = sh(
+                    //         script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
+                    //         returnStdout: true
+                    //     )
+                    //     echo "✅ 执行结果:"
+                    //     echo result
+                    // } catch (Exception e) {
+                    //     echo "❌ 执行失败: ${e.getMessage()}"
+                    // }
                 }
             }
         }

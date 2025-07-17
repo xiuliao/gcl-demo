@@ -1,24 +1,29 @@
 pipeline {
-    agent {
-        node {
-            label 'any'
-            customWorkspace '/opt/GCL/bin'
-        }
-    }
+    agent any
     
     stages {
-        stage('Checkout') {
+        stage('Setup and Checkout') {
             steps {
-                // 检出代码
-                checkout scm
-                echo "✅ 代码检出完成"
-                
-                // 显示当前分支和提交信息
                 script {
-                    def gitBranch = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                    def gitCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                    echo "🌿 当前分支: ${gitBranch}"
-                    echo "📝 提交哈希: ${gitCommit}"
+                    // 创建并切换到/opt/GCL/bin目录
+                    sh 'mkdir -p /opt/GCL/bin'
+
+                    // 在/opt/GCL/bin/workspace目录中检出代码
+                    dir('/opt/GCL/bin/workspace') {
+                        // 检出代码
+                        checkout scm
+                        echo "✅ 代码检出到 /opt/GCL/bin/workspace 完成"
+
+                        // 显示当前分支和提交信息
+                        def gitBranch = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+                        def gitCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                        echo "🌿 当前分支: ${gitBranch}"
+                        echo "📝 提交哈希: ${gitCommit}"
+
+                        // 显示当前工作目录
+                        def currentDir = pwd()
+                        echo "📁 当前工作目录: ${currentDir}"
+                    }
                 }
             }
         }
@@ -27,9 +32,11 @@ pipeline {
         stage('List files') {
             steps {
                 script {
-                    def workspace = pwd()
-                    echo "当前工作目录: ${workspace}"
-                    sh 'ls -la'
+                    dir('/opt/GCL/bin/workspace') {
+                        def workspace = pwd()
+                        echo "📁 当前工作目录: ${workspace}"
+                        sh 'ls -la'
+                    }
                 }
             }
         }
@@ -37,38 +44,33 @@ pipeline {
         stage('Execute GCL Files') {
             steps {
                 script {
-                    // 获取当前工作目录的绝对路径
-                    def workspaceDir = pwd()
-                    echo "📁 工作目录: ${workspaceDir}"
+                    dir('/opt/GCL/bin') {
+                        // 直接执行workspace目录中的Ballot.gcl文件
+                        def gclFile = "/opt/GCL/bin/workspace/Ballot.gcl"
+                        echo "🚀 执行GCL文件: ${gclFile}"
 
-                    // 查找所有.gcl文件
-                    def findResult = sh(
-                        script: "find ${workspaceDir} -name '*.gcl' -type f",
-                        returnStdout: true
-                    ).trim()
-
-                    if (findResult) {
-                        def gclFiles = findResult.split('\n')
-                        echo "🔍 找到 ${gclFiles.size()} 个GCL文件:"
-
-                        // 执行每个.gcl文件
-                        gclFiles.each { gclFile ->
-                            if (gclFile.trim()) {
-                                echo "🚀 执行GCL文件: ${gclFile}"
-                                try {
-                                    def result = sh(
-                                        script: "chsimu \"${gclFile}\" -stdout",
-                                        returnStdout: true
-                                    )
-                                    echo "✅ 执行结果:"
-                                    echo result
-                                } catch (Exception e) {
-                                    echo "❌ 执行失败: ${e.getMessage()}"
-                                }
-                            }
+                        try {
+                            def result = sh(
+                                script: "chsimu \"${gclFile}\" -stdout",
+                                returnStdout: true
+                            )
+                            echo "✅ 执行结果:"
+                            echo result
+                        } catch (Exception e) {
+                            echo "❌ 执行失败: ${e.getMessage()}"
                         }
-                    } else {
-                        echo "⚠️ 未找到任何.gcl文件"
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    dir('/opt/GCL/bin') {
+                        echo "🧹 清理workspace目录..."
+                        sh 'rm -rf workspace'
+                        echo "✅ 清理完成"
                     }
                 }
             }

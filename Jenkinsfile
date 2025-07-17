@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        node {
+        node('jenkins-agent') {
             customWorkspace '/opt/GCL/bin'
         }
     }

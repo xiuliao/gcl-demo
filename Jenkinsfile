@@ -39,11 +39,11 @@ pipeline {
                     dir('/opt/GCL/bin') {
                         // 直接执行workspace目录中的Ballot.gcl文件
                         def gclFile = "/var/jenkins_home/workspace/test/Ballot.gcl"
-                        echo "🚀 执行GCL文件: ${gclFile}"
+                        echo "🚀 执行GCL文件: /opt/GCL/bin/chsimu \"${gclFile}\" -stdout"
 
                         try {
                             def result = sh(
-                                script: "./chsimu \"${gclFile}\" -stdout",
+                                script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
                                 returnStdout: true
                             )
                             echo "✅ 执行结果:"

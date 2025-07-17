@@ -5,25 +5,27 @@ pipeline {
         stage('Setup and Checkout') {
             steps {
                 script {
-                    // 创建并切换到/opt/GCL/bin目录
-                    sh 'mkdir -p /opt/GCL/bin'
+                    // 在Jenkins工作空间中检出代码
+                    checkout scm
+                    echo "✅ 代码检出完成"
 
-                    // 在/opt/GCL/bin/workspace目录中检出代码
-                    dir('/opt/GCL/bin/workspace') {
-                        // 检出代码
-                        checkout scm
-                        echo "✅ 代码检出到 /opt/GCL/bin/workspace 完成"
+                    // 显示当前分支和提交信息
+                    def gitBranch = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+                    def gitCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    echo "🌿 当前分支: ${gitBranch}"
+                    echo "📝 提交哈希: ${gitCommit}"
 
-                        // 显示当前分支和提交信息
-                        def gitBranch = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                        def gitCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                        echo "🌿 当前分支: ${gitBranch}"
-                        echo "📝 提交哈希: ${gitCommit}"
+                    // 显示当前工作目录
+                    def currentDir = pwd()
+                    echo "📁 当前工作目录: ${currentDir}"
 
-                        // 显示当前工作目录
-                        def currentDir = pwd()
-                        echo "📁 当前工作目录: ${currentDir}"
-                    }
+                    // 创建/opt/GCL/bin/workspace目录并复制文件
+                    sh '''
+                        sudo mkdir -p /opt/GCL/bin/workspace
+                        sudo cp -r * /opt/GCL/bin/workspace/
+                        sudo chmod -R 755 /opt/GCL/bin/workspace
+                    '''
+                    echo "✅ 文件复制到 /opt/GCL/bin/workspace 完成"
                 }
             }
         }
@@ -67,11 +69,9 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    dir('/opt/GCL/bin') {
-                        echo "🧹 清理workspace目录..."
-                        sh 'rm -rf workspace'
-                        echo "✅ 清理完成"
-                    }
+                    echo "🧹 清理workspace目录..."
+                    sh 'sudo rm -rf /opt/GCL/bin/workspace'
+                    echo "✅ 清理完成"
                 }
             }
         }

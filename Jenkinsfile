@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            customWorkspace '/opt/GCL/bin'
+        }
+    }
     
     stages {
         stage('Checkout') {
@@ -21,7 +25,11 @@ pipeline {
         
         stage('List files') {
             steps {
-                sh 'ls'
+                script {
+                    def workspace = pwd()
+                    echo "当前工作目录: ${workspace}"
+                    sh 'ls -la'
+                }
             }
         }
     

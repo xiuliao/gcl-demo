@@ -18,14 +18,6 @@ pipeline {
                     // 显示当前工作目录
                     def currentDir = pwd()
                     echo "📁 当前工作目录: ${currentDir}"
-
-                    // 创建/opt/GCL/bin/workspace目录并复制文件
-                    sh '''
-                        sudo mkdir -p /opt/GCL/bin/workspace
-                        sudo cp -r * /opt/GCL/bin/workspace/
-                        sudo chmod -R 755 /opt/GCL/bin/workspace
-                    '''
-                    echo "✅ 文件复制到 /opt/GCL/bin/workspace 完成"
                 }
             }
         }
@@ -48,12 +40,12 @@ pipeline {
                 script {
                     dir('/opt/GCL/bin') {
                         // 直接执行workspace目录中的Ballot.gcl文件
-                        def gclFile = "/opt/GCL/bin/workspace/Ballot.gcl"
+                        def gclFile = "/var/jenkins_home/workspace/test/Ballot.gcl"
                         echo "🚀 执行GCL文件: ${gclFile}"
 
                         try {
                             def result = sh(
-                                script: "chsimu \"${gclFile}\" -stdout",
+                                script: "./chsimu \"${gclFile}\" -stdout",
                                 returnStdout: true
                             )
                             echo "✅ 执行结果:"

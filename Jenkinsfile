@@ -64,8 +64,9 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    echo "🧹 清理workspace目录..."
-                    sh 'rm -rf /var/jenkins_home/workspace/test'
+                    echo "🧹 清理临时文件..."
+                    // 只清理我们不需要的临时文件，不删除Jenkins工作空间
+                    sh 'rm -f *.tmp *.log || true'
                     echo "✅ 清理完成"
                 }
             }

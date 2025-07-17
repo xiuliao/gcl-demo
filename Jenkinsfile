@@ -33,26 +33,26 @@ pipeline {
             }
         }
 
-        stage('Execute GCL Files') {
-            steps {
-                script {
-                    sh 'cd /opt/GCL/bin'
-                    def workspace = pwd()
-                    echo "📁 当前工作目录: ${workspace}"
-                    sh 'ls -la'
-                    // try {
-                    //     def result = sh(
-                    //         script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
-                    //         returnStdout: true
-                    //     )
-                    //     echo "✅ 执行结果:"
-                    //     echo result
-                    // } catch (Exception e) {
-                    //     echo "❌ 执行失败: ${e.getMessage()}"
-                    // }
-                }
-            }
-        }
+        // stage('Execute GCL Files') {
+        //     steps {
+        //         script {
+        //             sh 'cd /opt/GCL/bin'
+        //             def workspace = pwd()
+        //             echo "📁 当前工作目录: ${workspace}"
+        //             sh 'ls -la'
+        //             // try {
+        //             //     def result = sh(
+        //             //         script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
+        //             //         returnStdout: true
+        //             //     )
+        //             //     echo "✅ 执行结果:"
+        //             //     echo result
+        //             // } catch (Exception e) {
+        //             //     echo "❌ 执行失败: ${e.getMessage()}"
+        //             // }
+        //         }
+        //     }
+        // }
 
         stage('Cleanup') {
             steps {

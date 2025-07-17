@@ -33,26 +33,36 @@ pipeline {
             }
         }
 
-        // stage('Execute GCL Files') {
-        //     steps {
-        //         script {
-        //             sh 'cd /opt/GCL/bin'
-        //             def workspace = pwd()
-        //             echo "📁 当前工作目录: ${workspace}"
-        //             sh 'ls -la'
-        //             // try {
-        //             //     def result = sh(
-        //             //         script: "/opt/GCL/bin/chsimu \"${gclFile}\" -stdout",
-        //             //         returnStdout: true
-        //             //     )
-        //             //     echo "✅ 执行结果:"
-        //             //     echo result
-        //             // } catch (Exception e) {
-        //             //     echo "❌ 执行失败: ${e.getMessage()}"
-        //             // }
-        //         }
-        //     }
-        // }
+        stage('Execute GCL Files') {
+            steps {
+                script {
+                    // 获取当前Jenkins工作空间路径
+                    def jenkinsWorkspace = pwd()
+                    echo "📁 Jenkins工作空间: ${jenkinsWorkspace}"
+
+                    // 构建GCL文件的完整路径
+                    def gclFile = "${jenkinsWorkspace}/Ballot.gcl"
+                    echo "🚀 执行GCL文件: ${gclFile}"
+
+                    // 切换到/opt/GCL/bin目录执行chsimu命令
+                    dir('/opt/GCL/bin') {
+                        def currentDir = pwd()
+                        echo "📁 当前执行目录: ${currentDir}"
+
+                        try {
+                            def result = sh(
+                                script: "chsimu \"${gclFile}\" -stdout",
+                                returnStdout: true
+                            )
+                            echo "✅ 执行结果:"
+                            echo result
+                        } catch (Exception e) {
+                            echo "❌ 执行失败: ${e.getMessage()}"
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Cleanup') {
             steps {
